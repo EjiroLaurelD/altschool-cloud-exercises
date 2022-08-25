@@ -1,38 +1,30 @@
-this folder contains the steps i took to set time zone on my machine
+##Exercise 1 - learn how to set timezones on your terminal and set the time zone on your machine. 
+e
+
 ## Linux Timezones Commands <a id="timezones"></a>
 
 <hr/>
 
-### timedatectl
+## `timedatectl`
 
-Display current Timezone
+This command displays current Timezone
 
-```bash
-## this displays current timezone
-timedatectl
-```
 
 <hr/>
 
-### timedatectl list-zones
+## `timedatectl list-zones`
 
-Displays a list of timezones 
+This command displays a list of timezones 
 
-```bash
-## this displays a list of available timezones
-timedatectl list-zones
-```
 
 <hr/>
 
-### sudo timedatectl set-timezone <your_time_zone>
+## `sudo timedatectl set-timezone <your_time_zone>`
 
-Set Timezone
+ This will set timezone to your preferred timezone on the list, for example let us set for Africa/Lagos.  You have to run the command as root user or sudo user
+`sudo timedatectl set-timezone Africa/Lagos`
 
-```bash
-## this will set timezone to your preferred timezone on the list, for example let us set for Africa/Lagos.  You have to run the command as root user or sudo user
-sudo timedatectl set-timezone Africa/Lagos
-```
 
 <hr/>
+![](screenshots/timezones.png)
 
