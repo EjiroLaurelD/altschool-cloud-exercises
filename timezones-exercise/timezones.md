@@ -1,4 +1,4 @@
-##Exercise 1 - learn how to set timezones on your terminal and set the time zone on your machine. 
+## Exercise 1 - learn how to set timezones on your terminal and set the time zone on your machine. 
 e
 
 ## Linux Timezones Commands <a id="timezones"></a>
@@ -26,5 +26,5 @@ This command displays a list of timezones
 
 
 <hr/>
-![](screenshots/timezones.png)
+![](../screenshots/timezones.png)
 
