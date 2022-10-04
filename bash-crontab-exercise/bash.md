@@ -6,4 +6,4 @@ Sample of email
 ![cronemail](../bash-crontab-exercise/cron-email.png)
 
 Cronjob 
-![cronjob](.../bash-crontab-exercise/cronjob.png)
+![cronjob](../bash-crontab-exercise/cronjob.png)
