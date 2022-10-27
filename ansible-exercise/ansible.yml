@@ -1,49 +1,28 @@
 ---
 - hosts: webserver
   become: true
+  vars:
+          http_port: 8000
+          https_port: 4443
+          html_welcome_msg: "hello laurel"
   tasks: 
   #this is a task to install apache to the latest version
           - name: install apache server
             apt:
-                    name: apache2
+                    name:
+                            -  apache2
+                            -  libapache2-mod-php
                     state: latest
 
-# install php latest version                    
-          - name: install php
-            apt:
-                    name: php
-                    state: latest
-
-# set timezone of server to africa lagos
+                    # set timezone of server to africa lagos
           - name: set timezone
             timezone:
-                    name: Africa/Lagos
+                   name: Africa/Lagos
 
 # host index.php file on apache and change permission to 644                                        
-          - name: host file
+          - name: host php file
+            tags: apache2
             copy:
-                    src: /home/vagrant/ansible/index.php
-                    dest: /var/www/html
-                    mode: 0644
-
-# remove indexhtml file if php succeeds
-          - name: replace index.html 
-            command: rm /var/www/html/index.html
-            when: php == success
-
-#upload index.html if php fails
-                    
-          - name: upload index.html 
-            command:
-                    src: /var/www/html/index.html
-                    when: php == failed
-          
-
-
-
-
-
-
-
-
-
+                   src: index.php
+                   dest: /var/www/html/
+                   mode: 0644

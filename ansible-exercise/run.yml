@@ -1,0 +1,41 @@
+---
+- hosts: webserver
+  become: true
+  tasks: 
+  #this is a task to install apache to the latest version
+          - name: install apache server
+            apt:
+                    name: apache2
+                    state: latest
+
+# install php latest version                    
+          - name: install php
+            apt:
+                    name: php
+                    state: latest
+
+# set timezone of server to africa lagos
+          - name: set timezone
+            timezone:
+                    name: Africa/Lagos
+
+# host index.php file on apache and change permission to 644                                        
+          - name: host file
+            copy:
+                    src: index.php
+                    dest: /var/www/html/index.html
+                    mode: 0644
+
+# remove index.html file if php succeeds
+# - name: replace index.html 
+#           command: rm /var/www/html/index.html
+#           when: php == success
+
+#upload index.html if php fails
+                    
+            #          - name: upload index.html 
+            #command:
+            #       src: /var/www/html/index.html
+            #       when: php == failed
+          
+

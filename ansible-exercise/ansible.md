@@ -6,4 +6,5 @@ Submit the Ansible playbook, the output of systemctl status apache2 after deploy
 Ansible [Playbook](../ansible-exercise/ansible.yml)
 
 Rendered page
-![rendered page](../ansible-exercise/rendered-page.png)
+![rendered page](../ansible-exercise/renderedphp.png)
+![systemctlstatus](../ansible-excercise/statusapache.png)
