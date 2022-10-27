@@ -7,4 +7,4 @@ Ansible [Playbook](../ansible-exercise/ansible.yml)
 
 Rendered page
 ![rendered page](../ansible-exercise/renderedphp.png)
-![systemctlstatus](../ansible-excercise/statusapache.png)
+![systemctlstatus](../ansible-exercise/statusapache.png)
