@@ -1,0 +1,153 @@
+---
+#Purpose of this file is to use ansible to set up Apache,Php and mysql. host is the name of servers, become is to give root privilege, vars is to rerefnce the variable file with our variables
+- hosts: all
+  become: true
+  vars_files:
+          - vars/kunrad.yml
+            
+  tasks:
+          - name: Install prerequisite 
+            apt: name={{ item }} state=latest force_apt_get=yes update_cache=y
+            loop: ['aptitude']
+
+          - name: Install software-properties-common
+            apt:
+                    name:
+                            - software-properties-common
+                            
+                    state: present
+          
+
+          - name: Install Apache and PHP Packages with all depencies
+            apt:
+                    name:
+                            - apache2
+                            - libapache2-mod-php  
+                            - php-mysql
+                            - php-curl
+                            - php-xml
+                            - php-opcache
+                            - php-common  
+                            - php-gd
+                            - python3-pymysql
+                            - php-tokenizer
+                            - php-json
+                            - php-bcmath
+                            - php-mbstring
+                            - php-zip
+                            - php-cli
+                            - php-dev
+                            - php-intl
+                            - php-soap  
+                            - git
+                            - curl
+                            - wget  
+
+                    state: latest
+
+          - name: Update cache and full system update
+            apt:
+                    update_cache: true
+                    upgrade: dist
+                    force_apt_get: true
+
+
+
+          - name: Install MySQL url
+            get_url:
+                    url: https://dev.mysql.com/get/mysql-apt-config_0.8.22-1_all.deb
+                    dest: /usr/src
+                    validate_certs: yes
+                    force: yes
+                    mode: 0755
+
+          - name: Install mysql repo
+            apt:
+
+                    deb: /usr/src/./mysql-apt-config_0.8.22-1_all.deb
+                    update_cache: true 
+                    force_apt_get: true
+                    state: present
+
+
+          
+
+          - name: Install MySQL server
+            apt:
+                    name: mysql-server
+                    state: present
+
+              
+
+          - name: Install composer
+            shell: curl -sS  https://getcomposer.org/installer | php
+            args:
+                    chdir: /usr/src/
+                    creates: /usr/local/bin/composer
+                    
+          
+
+          - name: Add composer to global path
+            copy:
+                    dest: /usr/local/bin/composer
+                    group: root
+                    owner: root
+                    mode: 0755
+                    src: /usr/src/composer.phar
+                    remote_src: yes
+            
+                  
+            #create document rfile, copy the file into the path, it should be a directory and the owner should be the app user and the file permission should be the mode permission
+
+          - name: Create Document Root
+            file:
+                    path: "/var/www/{{ http_hosts }}"
+                    state: directory
+                    owner: "{{ app_user }}"
+                    mode: 0755
+           
+          - name: Setup Apache vhost
+            template:
+                    src: "apache.conf.j2"
+                    dest: "/etc/apache2/sites-available/{{ http_conf }}"
+                    notify: Restart Apache
+
+
+          - name: Enable Apache site
+            shell: /usr/sbin/a2ensite "{{ http_conf }}"
+            notify: Restart Apache
+            
+            # this task will disable apache default site so the one i set up can run
+          - name: Disable Apache default site
+            shell: /usr/sbin/a2dissite 000-default.conf
+            when: disable_default
+            notify: Restart Apache
+
+          
+                     # create PHP info file
+
+          - name: Create PHP info file
+            copy:
+                    
+                    src: info.php.j2
+                    dest: /var/www/{{ http_hosts }}/info.php
+                    owner: "{{ app_user }}"
+                    mode: 0644
+                    
+
+                    handlers:
+                            - name: Reload Apache
+                              service:
+                                      name: apache2
+                                      state: reloaded
+
+                            - name: Restart Apache
+                              service:
+                                      name: apache2
+                                      state: restarted
+                                      
+                            - name: Restart mariadb
+                              service:
+                                      name: mariadb
+                                      state: restarted
+                                       # all the places where you have "notify" is what wer are using the handlers for       
