@@ -1,14 +1,16 @@
 <VirtualHost *:{{ http_port }}>
-    ServerAdmin webmaster@localhost
+    ServerAdmin admin@{{ http_hosts }}
     ServerName {{ http_hosts }}
     ServerAlias www.{{ http_hosts }}
-    DocumentRoot /var/www/{{ http_hosts }}
-    ErrorLog ${APACHE_LOG_DIR}/error.log
-    CustomLog ${APACHE_LOG_DIR}/access.log combined
+    DocumentRoot /var/www/exam-project/public
+    ErrorLog ${APACHE_LOG_DIR}/{{ http_hosts }}_error.log
+    CustomLog ${APACHE_LOG_DIR}/{{ http_hosts }}_access.log combined
 
 
-    <Directory /var/www/{{ http_hosts }}>
-        Options Indexes
+    <Directory /var/www/exam-project/public>
+        Options +FollowSymlinks
+        AllowOverride All
+        Require all granted
     </Directory>
     
     <ifModule mod_dir.c>

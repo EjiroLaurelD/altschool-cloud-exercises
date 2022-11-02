@@ -5,8 +5,8 @@ mysql_root_password: "laurel"
 #appuser can be your 
 app_user: "admin"
 #http host and conf is for hostname, it can be anything.com you can also use your server ip like so "3.84.120.205"
-http_hosts: "3.86.220.48"
-http_conf: "3.86.220.48.conf"
+http_hosts: "54.157.195.255"
+http_conf: "54.157.195.255.conf"
 
 #port 80 is the port number for https just like 22 is for our terminal
 http_port: "80"
