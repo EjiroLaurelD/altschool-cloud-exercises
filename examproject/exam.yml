@@ -1,14 +1,283 @@
 ---
-#this file was set up to create variables for apache 
-mysql_root_password: "laurel"
+#Purpose of this file is to use ansible to set up Apache,Php and mysql. host is the name of servers, become is to give root privilege, vars is to rerefnce the variable file with our variables
+- hosts: all
+  become: true
+  vars_files:
+          - vars.yml
+            
+  tasks:
+          - name: Install prerequisite 
+            apt: name={{ item }} state=latest force_apt_get=yes update_cache=true
+            loop: ['aptitude']
 
-#appuser can be your 
-app_user: "admin"
-#http host and conf is for hostname, it can be anything.com you can also use your server ip like so "3.84.120.205"
-http_hosts: "ejirolaureld.me"
-http_conf: "ejirolaureld.me.conf"
+          - name: Install software-properties-common
+            apt:
+                    name:
+                            - software-properties-common
+                            - wget
+                            - apache2
+                            - unzip
+                            - curl
+                            - git
+                            - gnupg  
 
-#port 80 is the port number for https just like 22 is for our terminal
-http_port: "80"
+                    state: latest
+           
+                   
 
-disable_default: true
+          - name: add sury repository
+            shell: echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/sury-php.list
+
+
+          - name: get url
+            get_url:
+                    url: https://packages.sury.org/php/apt.gpg
+                    dest: /etc/apt/trusted.gpg.d/php.gpg
+                    force: yes
+                    mode: '0755'
+                
+          - name: Update cache and system update
+            apt:
+                    update_cache: true
+                    upgrade: dist
+                    cache_valid_time: 3600
+                    force_apt_get: true
+
+                      
+
+          - name: Install Apache and PHP Packages with all depencies
+            apt:
+                    name:
+                            - php
+                            - libapache2-mod-php  
+                            - php8.1-mysql 
+                            - php8.1-curl
+                            - php8.1-xml
+                            - php8.1-opcache
+                            - php8.1-common  
+                            - php8.1-gd
+                            - python3-pymysql
+                            - php8.1-tokenizer
+                            - php8.1-bcmath
+                            - php8.1-mbstring
+                            - php8.1-zip
+                            - php8.1-cli
+                            - php8.1-dev
+                            - php8.1-intl
+                            - php8.1-soap  
+                            - openssl                        
+                    state: latest
+
+          - name: Update cache and full system update
+            apt:
+                    update_cache: true
+                    upgrade: dist
+                    force_apt_get: true
+
+
+
+          - name: Install MySQL url
+            get_url:
+                    url: https://dev.mysql.com/get/mysql-apt-config_0.8.22-1_all.deb
+                    dest: /home/admin
+                    validate_certs: yes
+                    force: yes
+                    mode: 0755
+
+          - name: Install mysql repo
+            apt:
+
+                    deb: /home/admin/./mysql-apt-config_0.8.22-1_all.deb
+                    update_cache: true 
+                    force_apt_get: true
+                    state: present
+
+          - name: Install mysql-server
+            apt:
+                    name: mysql-server
+                    state: latest
+
+          - name: set the root "mysql-password"
+            no_log: false 
+            mysql_user:
+                    name: root
+                    password: "{{ mysql_root_password }}"
+                    login_unix_socket: /var/run/mysqld/mysqld.sock
+                    check_implicit_admin: true
+
+          - name: create .my.cnf
+            template:
+                    src: "client.my.cnf.j2"
+                    dest: "/root/.my.cnf"
+                    owner: root
+                    group: root
+                    mode: 0755
+                     # this will create a new database after removing the default
+          - name: Create a new MYSQL Database
+            mysql_db:
+                    name: altschoolexam
+                    state: present
+                    login_user: root
+                    login_password: "{{ mysql_root_password }}"
+
+          - name: CLone git repository
+            git:
+                    repo: https://github.com/EjiroLaurelD/laravel-realworld-example-app
+                    dest: /var/www/exam-project/laravelapp
+                    clone: yes
+                    update: yes
+                    force: yes
+                    
+              
+          - name: copy .env file
+            copy:
+                    src: .env.j2
+                    dest: /var/www/exam-project/laravelapp/.env
+                    group: root
+                    owner: root
+                    mode: 0755
+          
+
+          - name: Install composer
+            shell: curl -sS  https://getcomposer.org/installer | php
+            args:
+                    chdir: /usr/src/
+                    creates: /usr/local/bin/composer
+                    
+          
+
+          - name: Add composer to global path
+            copy:
+                    dest: /usr/local/bin/composer
+                    group: root
+                    owner: root
+                    mode: 0755
+                    src: /usr/src/composer.phar
+                    remote_src: yes
+
+          - name: add user to www-data group
+            shell: usermod -a -G www-data "admin"
+       
+
+          - name: change owner /var/www/project
+            file:
+                    path: /var/www/exam-project/laravelapp
+                    owner: www-data
+                    group: www-data
+                    mode: 0775
+                    recurse: yes
+
+
+          - name: change permission of storage
+            become: yes
+            become_user: 'admin'
+            file:                    
+                    path: /var/www/exam-project/laravelapp/storage             
+                    owner: www-data
+                    group: www-data
+                    mode: 0775
+                    recurse: yes
+
+
+
+          - name: change permission bootstrap
+            become: yes
+            become_user: 'admin' 
+            file:
+                    path: /var/www/exam-project/laravelapp/bootstrap/cache
+                    owner: www-data
+                    group: www-data
+                    mode: 0775
+                    recurse: yes
+
+
+
+          - name:  composer install
+            become: yes
+            become_user: 'admin'
+            composer:
+                    command: install
+                    global_command: false
+                    working_dir: "/var/www/exam-project/laravelapp"
+                    no_dev: no
+      
+                    
+          - name: Generate artisan key
+            shell: php artisan key:generate
+            args:
+                    chdir: /var/www/exam-project/laravelapp
+
+          - name: Artisan migrate
+            shell: php artisan migrate
+            args:
+                    chdir: /var/www/exam-project/laravelapp
+
+          - name: cache configuration
+            shell: php artisan config:cache
+            args:
+                    chdir: /var/www/exam-project/laravelapp
+
+                   
+          - name: migrate fresh
+            tags: seed
+            shell: php artisan migrate:fresh
+            args:
+                    chdir: /var/www/exam-project/laravelapp
+                             
+          - name: migrate server
+            shell: php artisan migrate --seed
+            args:
+                    chdir: /var/www/exam-project/laravelapp
+                           
+                    
+                              
+           
+                  
+            #create document rfile, copy the file into the path, it should be a directory and the owner should be the app user and the file permission should be the mode permission
+
+          - name: Create Document Root
+            file:
+                    path: "/var/www/examproject/{ http_hosts }}"
+                    state: directory
+                    owner: "{{ app_user }}"
+                    mode: 0755
+           
+          - name: Setup Apache vhost
+            template:
+                    src: "apache.conf.j2"
+                    dest: "/etc/apache2/sites-available/{{ http_conf }}"
+                    mode: 0755
+
+          - name: enable ssl
+            shell: a2enmod ssl
+         
+          - name: Enable mod_rewrite in apache
+            shell: a2enmod rewrite
+            
+            
+
+          - name: Enable Apache site
+            shell: /usr/sbin/a2ensite "{{ http_conf }}"
+
+            
+            # this task will disable apache default site so the one i set up can run
+          - name: Disable Apache default site
+            shell: /usr/sbin/a2dissite 000-default.conf
+            when: disable_default
+
+          - name: restart apache2
+            shell: systemctl restart apache2
+
+          - name: Restart Apache
+            shell: systemctl restart apache2
+         
+          - name: add domain to /etc/hosts 
+            shell: echo '54.227.91.180  ejirolaureld.me' | sudo tee -a /etc/hosts
+          - name: Enable systemd resolve
+            shell: systemctl enable systemd-resolved.service
+
+          - name: flush DNS
+            shell: systemd-resolve --flush-caches
+
+          - name: restart apache
+            shell: systemctl restart apache2        
