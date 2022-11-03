@@ -1,0 +1,14 @@
+---
+#this file was set up to create variables for apache 
+mysql_root_password: "laurel"
+
+#appuser can be your 
+app_user: "admin"
+#http host and conf is for hostname, it can be anything.com you can also use your server ip like so "3.84.120.205"
+http_hosts: "ejirolaureld.me"
+http_conf: "ejirolaureld.me.conf"
+
+#port 80 is the port number for https just like 22 is for our terminal
+http_port: "80"
+
+disable_default: true
