@@ -1,6 +1,6 @@
 [webservers]
-54.157.195.255
-54.91.97.146
+52.5.94.125
+
 [webservers:vars]
 ansible_connection=ssh
 

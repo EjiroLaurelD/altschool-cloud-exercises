@@ -22,7 +22,15 @@
                             - gnupg  
 
                     state: latest
-           
+
+          - name: CLone git repository
+            git:
+                    repo: https://github.com/EjiroLaurelD/laravel-realworld-example-app
+                    dest: /var/www/exam-project
+                    clone: yes
+                    update: yes
+                    force: true
+                    
                    
 
           - name: add sury repository
@@ -98,12 +106,12 @@
                     state: latest
 
           - name: set the root "mysql-password"
-            no_log: false 
             mysql_user:
                     name: root
                     password: "{{ mysql_root_password }}"
                     login_unix_socket: /var/run/mysqld/mysqld.sock
                     check_implicit_admin: true
+                    
 
           - name: create .my.cnf
             template:
@@ -119,23 +127,37 @@
                     state: present
                     login_user: root
                     login_password: "{{ mysql_root_password }}"
-
-          - name: CLone git repository
-            git:
-                    repo: https://github.com/EjiroLaurelD/laravel-realworld-example-app
-                    dest: /var/www/exam-project/laravelapp
-                    clone: yes
-                    update: yes
-                    force: yes
-                    
               
           - name: copy .env file
             copy:
                     src: .env.j2
-                    dest: /var/www/exam-project/laravelapp/.env
+                    dest: /var/www/exam-project/.env
                     group: root
                     owner: root
                     mode: 0755
+
+          - name: add user to www-date group
+            shell: usermod -a -G www-data "admin"
+       
+
+          - name: change owner /var/www/project
+            file:
+                    path: /var/www/exam-project
+                    owner: www-data
+                    group: www-data
+                    mode: 0775
+                    
+
+
+          - name: change permission of storage
+            shell: chmod -R 775 ./storage
+            args:
+                    chdir: /var/www/exam-project/
+                                                           
+
+          - name: change permission bootstrap
+            shell: chmod -R 755 /var/www/exam-project/bootstrap/cache         
+
           
 
           - name: Install composer
@@ -155,79 +177,36 @@
                     src: /usr/src/composer.phar
                     remote_src: yes
 
-          - name: add user to www-data group
-            shell: usermod -a -G www-data "admin"
-       
-
-          - name: change owner /var/www/project
-            file:
-                    path: /var/www/exam-project/laravelapp
-                    owner: www-data
-                    group: www-data
-                    mode: 0775
-                    recurse: yes
-
-
-          - name: change permission of storage
-            become: yes
-            become_user: 'admin'
-            file:                    
-                    path: /var/www/exam-project/laravelapp/storage             
-                    owner: www-data
-                    group: www-data
-                    mode: 0775
-                    recurse: yes
-
-
-
-          - name: change permission bootstrap
-            become: yes
-            become_user: 'admin' 
-            file:
-                    path: /var/www/exam-project/laravelapp/bootstrap/cache
-                    owner: www-data
-                    group: www-data
-                    mode: 0775
-                    recurse: yes
-
-
-
           - name:  composer install
             become: yes
             become_user: 'admin'
             composer:
                     command: install
                     global_command: false
-                    working_dir: "/var/www/exam-project/laravelapp"
+                    working_dir: "/var/www/exam-project"
                     no_dev: no
       
                     
           - name: Generate artisan key
             shell: php artisan key:generate
             args:
-                    chdir: /var/www/exam-project/laravelapp
-
-          - name: Artisan migrate
-            shell: php artisan migrate
-            args:
-                    chdir: /var/www/exam-project/laravelapp
+                    chdir: /var/www/exam-project
 
           - name: cache configuration
             shell: php artisan config:cache
             args:
-                    chdir: /var/www/exam-project/laravelapp
+                    chdir: /var/www/exam-project
 
                    
-          - name: migrate fresh
-            tags: seed
+          - name: clear php
             shell: php artisan migrate:fresh
             args:
-                    chdir: /var/www/exam-project/laravelapp
-                             
+                    chdir: /var/www/exam-project
+                   
           - name: migrate server
             shell: php artisan migrate --seed
             args:
-                    chdir: /var/www/exam-project/laravelapp
+                    chdir: /var/www/exam-project
                            
                     
                               
@@ -237,7 +216,7 @@
 
           - name: Create Document Root
             file:
-                    path: "/var/www/examproject/{ http_hosts }}"
+                    path: "/var/www/{{ http_hosts }}"
                     state: directory
                     owner: "{{ app_user }}"
                     mode: 0755
@@ -265,19 +244,13 @@
             shell: /usr/sbin/a2dissite 000-default.conf
             when: disable_default
 
-          - name: restart apache2
-            shell: systemctl restart apache2
-
           - name: Restart Apache
             shell: systemctl restart apache2
          
           - name: add domain to /etc/hosts 
-            shell: echo '54.227.91.180  ejirolaureld.me' | sudo tee -a /etc/hosts
+            shell: echo '54.157.195.255  ejirolaureld.me' | sudo tee -a /etc/hosts
           - name: Enable systemd resolve
             shell: systemctl enable systemd-resolved.service
 
           - name: flush DNS
-            shell: systemd-resolve --flush-caches
-
-          - name: restart apache
-            shell: systemctl restart apache2        
+            shell: systemd-resolve --flush-caches          
