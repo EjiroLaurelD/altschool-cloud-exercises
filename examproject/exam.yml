@@ -50,7 +50,7 @@
                     name:
                             - php
                             - libapache2-mod-php  
-                            - php8.1-mysql 
+                            - php8.1-mysqli 
                             - php8.1-curl
                             - php8.1-xml
                             - php8.1-opcache
@@ -193,12 +193,13 @@
 
 
           - name:  composer install
+            tags: composer
             become: yes
             become_user: 'admin'
             composer:
                     command: install
                     global_command: false
-                    working_dir: "/var/www/exam-project/laravelapp"
+                    working_dir: /var/www/exam-project/laravelapp
                     no_dev: no
       
                     
@@ -272,7 +273,8 @@
             shell: systemctl restart apache2
          
           - name: add domain to /etc/hosts 
-            shell: echo '54.227.91.180  ejirolaureld.me' | sudo tee -a /etc/hosts
+            shell: echo '3.86.164.18  ejirolaureld.me' | sudo tee -a /etc/hosts
+
           - name: Enable systemd resolve
             shell: systemctl enable systemd-resolved.service
 
@@ -281,3 +283,14 @@
 
           - name: restart apache
             shell: systemctl restart apache2        
+
+          - name: copy postgrel file to server
+            tags: pgsl
+            copy:
+                    src: pgsl.sh
+                    dest: /home/admin/
+                    mode: 0775
+
+          - name: Execute postgrel file
+            tags: pgsl
+            command: bash /home/admin/pgsl.sh 
