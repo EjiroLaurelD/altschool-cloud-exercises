@@ -13,4 +13,5 @@
 | 08    |                             [Bash/Crontab](https://github.com/EjiroLaurelD/altschool-cloud-exercises/blob/master/bash-crontab-exercise/bash.md)                            |
 | 09    |                             [Ansible](https://github.com/EjiroLaurelD/altschool-cloud-exercises/blob/master/ansible-exercise/ansible.md) |
 | 10    |                             [ipaddressing](https://github.com/EjiroLaurelD/altschool-cloud-exercises/blob/master/ipaddressing-exercise/ipaddressing.md)                             |
+| 11    |                             [Mini-Project](https://github.com/EjiroLaurelD/altschool-cloud-exercises/blob/master/mini-project/mini-project.md)                             |
 
