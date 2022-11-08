@@ -1,0 +1,38 @@
+---
+- hosts: webservers
+  become: true
+  tasks: 
+  #this is a task to install apache to the latest version
+          - name: install apache server
+            apt:
+                    name:
+                            - apache2
+                            - libapache2-mod-php
+                            - mysql-server   
+                    state: latest
+                    update_cache: yes
+
+          - name: create database
+            mysql_db:
+                    name: miniprojectdb
+                    state: present
+                    login_user: root
+
+          - name: add sample database
+            copy:
+                    src: test.sql 
+                    dest: /tmp/test.sql
+
+          - name: insert date into datatbase
+            mysql_db:
+                    name: miniprojectdb
+                    state: import
+                    target: /tmp/test.sql
+                            
+
+# host index.php file on apache and change permission to 644                                        
+          - name: host php file
+            tags: apache2
+            copy:
+                    src: index.html
+                    dest: /var/www/html/index.html

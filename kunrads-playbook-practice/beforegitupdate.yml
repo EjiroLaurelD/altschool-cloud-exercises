@@ -1,0 +1,257 @@
+---
+#Purpose of this file is to use ansible to set up Apache,Php and mysql. host is the name of servers, become is to give root privilege, vars is to rerefnce the variable file with our variables
+- hosts: all
+  become: true
+  vars_files:
+          - vars/kunrad.yml
+            
+  tasks:
+          - name: Install prerequisite 
+            apt: name={{ item }} state=latest force_apt_get=yes update_cache=true
+            loop: ['aptitude']
+
+          - name: Install software-properties-common
+            apt:
+                    name:
+                            - software-properties-common
+                            - wget
+                            - apache2
+                            - unzip
+                            - curl
+                            - git
+                            - gnupg  
+
+                    state: latest
+
+          - name: CLone git repository
+            git:
+                    repo: https://github.com/EjiroLaurelD/laravel-realworld-example-app
+                    dest: /var/www/exam-project
+                    clone: yes
+                    
+                    
+                   
+
+          - name: add sury repository
+            shell: echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/sury-php.list
+
+
+          - name: get url
+            get_url:
+                    url: https://packages.sury.org/php/apt.gpg
+                    dest: /etc/apt/trusted.gpg.d/php.gpg
+                    force: yes
+                    mode: '0755'
+                
+          - name: Update cache and system update
+            apt:
+                    update_cache: true
+                    upgrade: dist
+                    cache_valid_time: 3600
+                    force_apt_get: true
+
+                      
+
+          - name: Install Apache and PHP Packages with all depencies
+            apt:
+                    name:
+                            - php
+                            - libapache2-mod-php  
+                            - php8.1-mysql 
+                            - php8.1-curl
+                            - php8.1-xml
+                            - php8.1-opcache
+                            - php8.1-common  
+                            - php8.1-gd
+                            - python3-pymysql
+                            - php8.1-tokenizer
+                            - php8.1-bcmath
+                            - php8.1-mbstring
+                            - php8.1-zip
+                            - php8.1-cli
+                            - php8.1-dev
+                            - php8.1-intl
+                            - php8.1-soap  
+                            - openssl                        
+                    state: latest
+
+          - name: Update cache and full system update
+            apt:
+                    update_cache: true
+                    upgrade: dist
+                    force_apt_get: true
+
+
+
+          - name: Install MySQL url
+            get_url:
+                    url: https://dev.mysql.com/get/mysql-apt-config_0.8.22-1_all.deb
+                    dest: /home/admin
+                    validate_certs: yes
+                    force: yes
+                    mode: 0755
+
+          - name: Install mysql repo
+            apt:
+
+                    deb: /home/admin/./mysql-apt-config_0.8.22-1_all.deb
+                    update_cache: true 
+                    force_apt_get: true
+                    state: present
+
+          - name: Install mysql-server
+            apt:
+                    name: mysql-server
+                    state: latest
+
+          - name: set the root "mysql-password"
+            mysql_user:
+                    name: root
+                    password: "{{ mysql_root_password }}"
+                    login_unix_socket: /var/run/mysqld/mysqld.sock
+                    check_implicit_admin: true
+                    
+
+          - name: create .my.cnf
+            template:
+                    src: "client.my.cnf.j2"
+                    dest: "/root/.my.cnf"
+                    owner: root
+                    group: root
+                    mode: 0755
+                     # this will create a new database after removing the default
+          - name: Create a new MYSQL Database
+            mysql_db:
+                    name: altschoolexam
+                    state: present
+                    login_user: root
+                    login_password: "{{ mysql_root_password }}"
+              
+          - name: copy .env file
+            copy:
+                    src: .env.j2
+                    dest: /var/www/exam-project/.env
+                    group: root
+                    owner: root
+                    mode: 0755
+
+          - name: add user to www-date group
+            shell: usermod -a -G www-data "admin"
+       
+
+          - name: change owner /var/www/project
+            file:
+                    path: /var/www/exam-project
+                    owner: www-data
+                    group: www-data
+                    mode: 0775
+                    recursive: yes
+
+
+          - name: change permission of storage
+            shell: chmod -R 775 ./storage
+            args:
+                    chdir: /var/www/exam-project/
+                                                           
+
+          - name: change permission bootstrap
+            shell: chmod -R 755 /var/www/exam-project/bootstrap/cache         
+
+          
+
+          - name: Install composer
+            shell: curl -sS  https://getcomposer.org/installer | php
+            args:
+                    chdir: /usr/src/
+                    creates: /usr/local/bin/composer
+                    
+          
+
+          - name: Add composer to global path
+            copy:
+                    dest: /usr/local/bin/composer
+                    group: root
+                    owner: root
+                    mode: 0755
+                    src: /usr/src/composer.phar
+                    remote_src: yes
+
+          - name:  composer install
+            become: yes
+            become_user: 'admin'
+            composer:
+                    command: install
+                    global_command: false
+                    working_dir: "/var/www/exam-project"
+                    no_dev: no
+      
+                    
+          - name: Generate artisan key
+            shell: php artisan key:generate
+            args:
+                    chdir: /var/www/exam-project
+
+          - name: cache configuration
+            shell: php artisan config:cache
+            args:
+                    chdir: /var/www/exam-project
+
+                   
+          - name: clear php
+            shell: php artisan migrate --force
+            become: yes
+            become_user: admin
+            args:
+                    chdir: /var/www/exam-project
+                   
+                    #          - name: migrate server
+                    #            shell: php artisan migrate:fresh
+                    #            args:
+                    #                    chdir: /var/www/exam-project
+                           
+                    
+                              
+           
+                  
+            #create document rfile, copy the file into the path, it should be a directory and the owner should be the app user and the file permission should be the mode permission
+
+          - name: Create Document Root
+            file:
+                    path: "/var/www/{{ http_hosts }}"
+                    state: directory
+                    owner: "{{ app_user }}"
+                    mode: 0755
+           
+          - name: Setup Apache vhost
+            template:
+                    src: "apache.conf.j2"
+                    dest: "/etc/apache2/sites-available/{{ http_conf }}"
+                    mode: 0755
+
+          - name: enable ssl
+            shell: a2enmod ssl
+         
+          - name: Enable mod_rewrite in apache
+            shell: a2enmod rewrite
+            
+            
+
+          - name: Enable Apache site
+            shell: /usr/sbin/a2ensite "{{ http_conf }}"
+
+            
+            # this task will disable apache default site so the one i set up can run
+          - name: Disable Apache default site
+            shell: /usr/sbin/a2dissite 000-default.conf
+            when: disable_default
+
+          - name: Restart Apache
+            shell: systemctl restart apache2
+         
+          - name: add domain to /etc/hosts 
+            shell: echo '54.157.195.255  ejirolaureld.me' | sudo tee -a /etc/hosts
+          - name: Enable systemd resolve
+            shell: systemctl enable systemd-resolved.service
+
+          - name: flush DNS
+            shell: systemd-resolve --flush-caches          

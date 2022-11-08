@@ -1,0 +1,19 @@
+[webservers]
+3.84.120.205
+
+[webservers:vars]
+ansible_connection=ssh
+
+#name of server user on aws
+ansible_ssh_user=admin
+
+#location to key file
+ansible_ssh_private_key_file=~/.ssh/mini-project.pem
+
+#port22 is my terminal port which we enabled in the security group on the instance 
+ansible-ssh_port=22
+
+#you can write it on one line like so
+# 3.84.120.205 ansible_ssh_user=admin ansible_ssh_private_key_file=~/.ssh/mini-project.pem ansible-ssh_port=22 
+
+

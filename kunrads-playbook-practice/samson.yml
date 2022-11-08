@@ -1,0 +1,13 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+          - name: Install Apache and PHP
+            apt:
+                    name:
+                            - apache2
+                            - libapache2-mod-php
+
+                    state: latest
+          
