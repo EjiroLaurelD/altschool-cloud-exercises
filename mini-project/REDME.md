@@ -1,8 +1,9 @@
+# Deploy a Laravel real world example application  using Debian 11 on a cloud provider.
 ![Laravel](../mini-project/laravel-page.png)
 
-As a mini project, were were given the task in Altschool to deploy a laravel app (a php framework) using a cloud provider of our choosing. This was a challenging task for me as it was my very first attempt at deployment. a lot of reseacrh and back and forth went into making this work. It was all worth it in the end. 
+As a mini project, we were given the task in Altschool to deploy a laravel app (a php framework) using a cloud provider of our choosing. This was a challenging task for me as it was my very first attempt at deployment. a lot of reseacrh and back and forth went into making this work. It was all worth it in the end. 
 
-- Demo project: https://github.com/EjiroLaurelD/laravel-realworld-example-app
+- Demo project forked from main project repo: https://github.com/EjiroLaurelD/laravel-realworld-example-app
 - Setup Debian 11 on a virtual machine instance with a cloud provider(I used AWS)
 - Setup apache with every dependency the application needs to run
 - Do not use Laravel Sail or Docker as suggested in the project README.md file, simply clone the project with git and deploy with Apache
