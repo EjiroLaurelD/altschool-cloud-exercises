@@ -7,6 +7,6 @@ Below are the steps I took to accomplish my second semester exam:
 - I created a security group and set inbound rules to allow port 80 and port 443 for http and https 
 - I wrote my playbook following the steps I took for my mini project, converting the commands to ansible modules( This took a lot of googling to achieve)
 - I created a project directory on  my master instance where i installed Ansible and all the dependencies i needed, then I deployed the playbook to the slave instance
-- I got a free domain name from name cheap (ejirolaureld.me) Thanks to github education
-- I also found access to a free ssl certificate from ![Cerbot](https://certbot.eff.org/instructions?ws=apache&os=debiantestin) 
+- I got a free domain name from name cheap (https://ejirolaureld.me) Thanks to github education
+- I also found access to a free ssl certificate from [Cerbot](https://certbot.eff.org/instructions?ws=apache&os=debiantestin) 
 - I finally pushed everything to github and have my fingers crossed waiting to be graded
