@@ -1,3 +1,5 @@
+![Laravel](../mini-project/laravel-page.png)
+
 As a mini project, were were given the task in Altschool to deploy a laravel app (a php framework) using a cloud provider of our choosing. This was a challenging task for me as it was my very first attempt at deployment. a lot of reseacrh and back and forth went into making this work. It was all worth it in the end. 
 
 - Demo project: https://github.com/EjiroLaurelD/laravel-realworld-example-app
@@ -148,11 +150,13 @@ Create your Database
 CREATE DATABASE name-of-database ;
 ```
 name of database is the name you want to call your database, it can be anything. After doing this, type 
-````
+
+```
 exit
 ```
 
 ### Install Composer 
+
 Composer is a dependency manager for PHP used for managing dependencies and libraries required for PHP applications. To install composer run the following command:
 
 ```
@@ -331,9 +335,11 @@ After editing your host machines etc/hosts file, flush your DNS cache afterwards
 sudo systemd-resolve  --flush-caches
 ```
 
-If you have gotten to this point and encountering a 404 error, you have succeeded.
+If you have gotten to this point and encountering a 404 : Not found message, you have succeeded.
 
-![minions.gif](https://cdn.hashnode.com/res/hashnode/image/upload/v1667148424621/bvB5SZNa6.gif align="left")
+<p align="center">
+  <img src="../mini-project/minions.gif">
+</p>
 
 Follow the steps below to see the default Laravel page:
 
