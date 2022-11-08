@@ -49,8 +49,8 @@
             apt:
                     name:
                             - php
-                            - libapache2-mod-php  
-                            - php8.1-mysqli 
+                            - libapache2-mod-php
+                            - php8.1-mysql   
                             - php8.1-curl
                             - php8.1-xml
                             - php8.1-opcache
@@ -273,7 +273,7 @@
             shell: systemctl restart apache2
          
           - name: add domain to /etc/hosts 
-            shell: echo '3.86.164.18  ejirolaureld.me' | sudo tee -a /etc/hosts
+            shell: echo '54.82.190.160  ejirolaureld.me' | sudo tee -a /etc/hosts
 
           - name: Enable systemd resolve
             shell: systemctl enable systemd-resolved.service
@@ -287,10 +287,10 @@
           - name: copy postgrel file to server
             tags: pgsl
             copy:
-                    src: pgsl.sh
+                    src: postgre.sh
                     dest: /home/admin/
-                    mode: 0775
+                    mode: 0755
 
           - name: Execute postgrel file
             tags: pgsl
-            command: bash /home/admin/pgsl.sh 
+            shell: sh /home/admin/postgre.sh
