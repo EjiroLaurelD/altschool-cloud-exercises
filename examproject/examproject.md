@@ -1,0 +1,12 @@
+Below are the steps I took to accomplish my second semester exam: 
+- I already have an account with AWS so i used AWS for the deployment
+- I created a VPC and subnets on AWS
+- I added route tables and internet gateway
+- I created two instances on the VPC i created, one master(Ubuntu) and one slave(Debian).
+- I made use of the key pair I already had
+- I created a security group and set inbound rules to allow port 80 and port 443 for http and https 
+- I wrote my playbook following the steps I took for my mini project, converting the commands to ansible modules( This took a lot of googling to achieve)
+- I created a project directory on  my master instance where i installed Ansible and all the dependencies i needed, then I deployed the playbook to the slave instance
+- I got a free domain name from name cheap (https://ejirolaureld.me) Thanks to github education
+- I also found access to a free ssl certificate from [Cerbot](https://certbot.eff.org/instructions?ws=apache&os=debiantestin) 
+- I finally pushed everything to github and have my fingers crossed waiting to be graded
