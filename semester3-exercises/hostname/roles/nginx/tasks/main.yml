@@ -29,10 +29,10 @@
           path: /etc/nginx/sites-enabled/default
           state: absent
 
-- name: copy index.php to site
+- name: copy project directory to site
   template:
-          src: index.php
-          dest: "/var/www/{{ http_host }}/"
+          src: /project
+          dest: /var/www/
           mode: '0755'
           owner: "{{ app_user }}"
           group: "{{ app_user }}"
