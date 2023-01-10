@@ -1,9 +1,10 @@
 ---
 
-app_user: "ubuntu"
-http_host: "3.84.218.67"
-http_conf: "3.84.218.67.conf"
-www_host: "www.3.84.218.67"
+app_user: "www-data"
+repo_name: "hostname-project"
+http_host: "44.203.38.38"
+http_conf: "44.203.38.38.conf"
+www_host: "www.44.203.38.38"
 php_repo: "ppa:ondrej/php"
 domain: "ejirolaureld.me"
 domain_alias: "www.ejirolaureld.me"

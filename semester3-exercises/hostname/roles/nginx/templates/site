@@ -2,7 +2,7 @@ server {
     listen 80;
     listen [::]:80;
     server_name "{{ http_host }}" "{{ www_host }}";
-    root /var/www/{{ repo_name }};
+    root /var/www/html;
 
     index index.html index.htm index.php;
 
@@ -13,7 +13,6 @@ server {
     location ~ \.php$ {
         include snippets/fastcgi-php.conf;
         fastcgi_pass unix:/var/run/php/php8.1-fpm.sock;
-        fastcgi_param   SCRIPT_FILENAME $document_root$fastcgi_script_name;
      }
 
     location ~ /\.ht {

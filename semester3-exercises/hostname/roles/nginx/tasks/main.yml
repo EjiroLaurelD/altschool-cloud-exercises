@@ -10,11 +10,12 @@
 - name: create www document root directory
   become: true
   file:
-          path: "/var/www/{{ http_host }}"
+
+          path: /var/www/html
           state: directory
           mode: '0775'
-          owner: www-data
-          group: www-data
+          owner: "{{ app_user }}"
+          group: "{{ app_user }}"
           recurse: yes
   tags: nginx
          
@@ -29,10 +30,10 @@
           path: /etc/nginx/sites-enabled/default
           state: absent
 
-- name: copy project directory to site
+- name: copy index.php to site
   template:
-          src: /project
-          dest: /var/www/
+          src: index.php
+          dest: /var/www/html
           mode: '0755'
           owner: "{{ app_user }}"
           group: "{{ app_user }}"
@@ -45,10 +46,37 @@
           owner: root
           group: root
           mode: '0644'
+  tags: nginx
+
+- name: clone project repo to site
+  git:
+          repo: https://github.com/EjiroLaurelD/hostname-project
+          dest: "/var/www/{{ repo_name }}"
+          clone: yes
+          update: yes
+          force: yes
+  tags: nginx
+  
+
+- name: change owner of site repo
+  become: true
+  file:
+          path: "/var/www/{{ repo_name }}"
+          state: directory
+          owner: "{{ app_user }}"
+          group: "{{ app_user }}"
+          mode: '0775'
+          recurse: yes
+  tags: nginx
+
 
 - name: enable new conf
   become: true
   shell: ln -s /etc/nginx/sites-available/site.conf /etc/nginx/sites-enabled/
-  notify:
-          - nginx service started
-          - nginx service enabled          
+  tags: nginx
+  
+- name: reload nginx
+  service:
+          name: nginx
+          state: reloaded
+        
