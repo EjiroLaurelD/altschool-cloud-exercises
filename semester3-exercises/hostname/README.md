@@ -1,5 +1,8 @@
 ## This project was created to fufil the following instructions, given as a project for Altschool Africa Cloud engineering Semester 3 holiday challenge
 
+### I solved this task using Ansible to provison the instances on AWS. Also, I used ansible to make configurations on the instances. App is live and running with ALB url http://project-alb-362817232.us-east-1.elb.amazonaws.com/
+ domain-name: ejirolaureld.me
+
 
 ### You are required to perform the following tasks
 
@@ -18,8 +21,5 @@
 - You must submit a custom domain name(from a domain provider e.g. Route53) or the ALB’s domain name.
 
 
-I solved this task using both the GUI and  Ansible to provison the instances on AWS. Also, i further used ansible to make configurations on the instances. app is live and running with url http://project-alb-362817232.us-east-1.elb.amazonaws.com/
-At time of of writing this readme, the dns name is yet to propagate.
- domain-name: ejirolaureld.me
 
 
