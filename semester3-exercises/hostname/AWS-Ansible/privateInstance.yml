@@ -5,14 +5,8 @@
   connection: local
   gather_facts: False
 
-  vars:
-    key_name: ansiblenew
-    region: us-east-1
-    image: ami-06878d265978313ca # https://cloud-images.ubuntu.com/locator/ec2/
-    id: "BH2-privateInstance"
-    sec_group: "{{ id }}-sec"
-    ec2_access_key: "{{ vault_ec2_acess_key }}"
-    ec2_secret_key: "{{ vault_ec2_acess_key }}"
+  vars_files:
+            - vars/var.yml          
 
   tasks:
 
@@ -66,10 +60,10 @@
           aws_access_key: "{{ec2_access_key}}"
           aws_secret_key: "{{ec2_secret_key}}"
           key_name: "{{ key_name }}"
-          id: "{{ id }}"
+          id: "{{ PI-id }}"
           vpc_subnet_id: subnet-0d41e7c5ece8251b7
           group_id: "{{ result_sec_group.group_id }}"
-          image: "{{ image }}"
+          image: "{{ PI-image }}"
           instance_type: t2.micro
           region: "{{ region }}"
           wait: true
