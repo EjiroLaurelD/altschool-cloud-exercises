@@ -1,12 +1,14 @@
 ---
 
-# AWS playbook
-- hosts: localhost
-  connection: local
-  gather_facts: False
-
-  vars_files:
-            - vars/var.yml          
+# AWS playbook for privat instance
+vars:
+    key_name: ansiblenew
+    region: us-east-1
+    image: ami-06878d265978313ca # https://cloud-images.ubuntu.com/locator/ec2/
+    id: "my-app"
+    sec_group: "{{ id }}-sec"
+    ec2_access_key: "{{ vault_ec2_access_key }}"
+    ec2_secret_key: "{{ vault_ec2_secret_key }}"
 
   tasks:
 
@@ -41,7 +43,7 @@
 
       - name: Create security group
         ec2_group:
-          name: "{{ sec_group }}"
+          name: "{{ id }}-sec"
           description: "Sec group for app {{ id }}"
           vpc_id: vpc-07e8226f9a649e65b
           region: "{{ region }}"
@@ -51,7 +53,7 @@
             - proto: tcp
               ports:
                 - 22
-              cidr_ip: 10.0.0.0/0
+              cidr_ip: 0.0.0.0/0
               rule_desc: allow all on ssh port
         register: result_sec_group
 
@@ -60,14 +62,14 @@
           aws_access_key: "{{ec2_access_key}}"
           aws_secret_key: "{{ec2_secret_key}}"
           key_name: "{{ key_name }}"
-          id: "{{ BH-id }}"
-          vpc_subnet_id: subnet-0e12d662c2e368fa7
+          id: "{{ id }}"
+          vpc_subnet_id: subnet-0d41e7c5ece8251b7
           group_id: "{{ result_sec_group.group_id }}"
-          image: "{{ BH-image }}"
+          image: "{{ image }}"
           instance_type: t2.micro
           region: "{{ region }}"
           wait: true
-          count: 1
+          count: 2
           # exact_count: 2
           # count_tag:
           #   Name: App
