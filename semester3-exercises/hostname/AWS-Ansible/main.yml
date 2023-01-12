@@ -9,6 +9,6 @@
   roles:
           - bastion-host
           - private-instance
-          - nat-instance
+          
           
 
