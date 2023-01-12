@@ -22,7 +22,7 @@
 
 
 ### I solved this task using two methods:
-Firstly, I practiced using Ansible to provison the instances on AWS. Also, I used ansible to make configurations on the instances. Playbook is in my repository
+Firstly, I practiced using Ansible to provision the insfracstructure on AWS. Also, I used ansible to make configurations on the instances. Playbook is in my repository
 [playbook](https://github.com/EjiroLaurelD/altschool-cloud-exercises/tree/master/semester3-exercises/hostname/AWS-Ansible)                                                  
 Second method was using the AWS GUI to manually provison servers using auto scaling groups, adding the instances to a target group in a Load balancer. 
 I deployed the nginx server and my app using ansible then i used Nat gateway to make the site higly available.
