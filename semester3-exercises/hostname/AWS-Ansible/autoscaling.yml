@@ -12,9 +12,10 @@
  # https://cloud-images.ubuntu.com/locator/ec2/
     id: "private-instance"
     sec_group: "{{ id }}-sec"
-    ec2_access_key: AKIAY2A6FY7ZQREIPGUQ
-    ec2_secret_key: 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
+    ec2_access_key: "{{ ec2_access_key }}"
+    ec2_secret_key: "{{ ec2_secret_key }}"
 
+   
   tasks:
 
     - name: Facts

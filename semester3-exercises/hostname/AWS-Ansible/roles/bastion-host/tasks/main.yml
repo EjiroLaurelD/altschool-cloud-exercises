@@ -1,13 +1,6 @@
 ---
 
 # AWS playbook for bastion host instance
-vars:
-    image: ami-0b5eea76982371e91 # https://cloud-images.ubuntu.com/locator/ec2/
-    id: "my-app"
-    sec_group: "{{ id }}-sec"
-   
-tasks:
-
   - name: Facts
     block:
 
@@ -38,7 +31,7 @@ tasks:
 
       - name: Create security group
         ec2_group:
-          name: "{{ sec_group }}"
+          name: my-app-sec
           description: "Sec group for ap {{ id }}"
           vpc_id: vpc-07e8226f9a649e65b
           region: "{{ region }}"
@@ -57,10 +50,10 @@ tasks:
           aws_access_key: "{{ec2_access_key}}"
           aws_secret_key: "{{ec2_secret_key}}"
           key_name: "{{ key_name }}"
-          id: "{{ id }}"
+          id: my-app
           vpc_subnet_id: subnet-0e12d662c2e368fa7
           group_id: "{{ result_sec_group.group_id }}"
-          image: "{{ image }}"
+          image: ami-0b5eea76982371e91
           instance_type: t2.micro
           region: "{{ region }}"
           wait: true

@@ -4,7 +4,7 @@
   gather_facts: False
 
   vars_files:
-            - vars/var.yml          
+          - vars/var.yml          
 
   roles:
           - bastion-host
