@@ -2,7 +2,8 @@
 
 ### I solved this task using two methods:
 Firstly, I practiced using Ansible to provison the instances on AWS. Also, I used ansible to make configurations on the instances.
-Second method was using the AWS GUI to manually provison servers using auto scaling groups, adding the instances to a target group in a Load balancer. I went further to use Nat gateway to make the site higly avaible.
+Second method was using the AWS GUI to manually provison servers using auto scaling groups, adding the instances to a target group in a Load balancer. 
+I deployed the nginx server and my app using ansible then i used Nat gateway to make the site higly available.
 App is live and running with ALB url http://project-alb-362817232.us-east-1.elb.amazonaws.com/
  domain-name: ejirolaureld.me
 
