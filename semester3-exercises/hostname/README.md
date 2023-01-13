@@ -156,6 +156,6 @@ Viola, your app is highly available. Use the ALB link to view it and it should l
 
 Thank you for reading my process.
 
-I will be documenting the process of Configuring the insfrature with an updated Ansible-playbook shortly. 
+I will be documenting the process of Configuring the insfrastructure with an updated Ansible-playbook shortly. 
 
 Watch this space!
