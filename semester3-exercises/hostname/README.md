@@ -32,7 +32,14 @@ After connecting to the public internet using natgateway, I deleted the natgatew
 My-App is live and running with ALB url http://project-alb-362817232.us-east-1.elb.amazonaws.com/
  domain-name: ejirolaureld.me
  
-### VPC
+ 
+## Process guide for the second method
+
+First we have to define a logical network.
+
+Defining a logical network on the cloud simply means to create your  VPC and its components to make your app highly available on the internet. To do this, create the folllowing on your AWS console;
+ 
+### Create VPC
 Name your VPC and include a CIDR block 10.0.0.0/16.
 ![VPC](../hostname//vpc.png)
 
@@ -60,24 +67,95 @@ Create an Internet gateway to allow internet access through our instances and at
 
 ![internetgateway](../hostname/igw.png)
 
+### NAT gateway
+Create a NAT-gateway and allocate  an elastic IP to it. Go back to your route tables and edit route tables under actions. Add route with the CIDR 0.0.0.0/0  as your destination, and set target as Nat-gateway then  save changes.
+Under actions click on edit subnet associations and add your public subnet to your public route table.
 
-### Application Load-Balancer
-![Loadbalancer](../hostname/lb.png)
+Viola! Our network is set up.
+Lets move on to creating our Instances.
 
-### Target group
-![targetgroup](../hostname/target-group.png)
+## CREATING OUR INSTANCES
+After we create our network, the next thing is to provision our EC2 instances. To do this we will be creating 1 public instance which will serve as our Bastion host and 2 private instances where we will be deploying our apps to.
 
-### Autoscaling
-![Autoscaling](../hostname/autoscaling.png)
+### Creating the Bastion Host
+To do this, create an instance in the public subnet of your VPC and name it Bastion-Host.
 
-### EC2
-![instance](../hostname/instance.png)
+Assign a keypair because you will need it to ssh into the private instances we will create shortly with Autoscaling groups
 
-### Security group rules for EC2
+Create a security group and give it the following rules 
+
+- Inbound rule: allow ssh  anywhere CIDR 0.0.0.0/0
+- outbound rule: allow All traffic CIDR 0.0.0.0/0
+
+![securitygroup](../hostname/bhsgin.png)
+![securitygroup](../hostname/bhout.png)
+
+Next we create our private instances using AutoScaling groups
+
+### AutoScaling Groups
+
+Navigate to Autoscaling groups at the bottom of your EC2 dashboard and click on create.
+
+Choose a name for your ASG and create a launch template.
+
+choose the name of your ASG
+
+choose your linux distribution and select t2micro
+
+Select a key pair. make sure to use same key with your bastion host or copy the newly keypair to your bastion host. we need this to be able to ssh from your bastion host to the private instances we'll be provioning with ASG
+
+Do not include subnet in launch template. we will include the subnet in the autoscaling group itself.
+
+create security groups with the rules as seen below in image. (Please make sure to edit the rules to include the security group of the ALB after we create it. I took screenshots after I had completed my process  that is why we can see the rule with the ALB sec group at this point)
+
 ![securitygroup](../hostname/sg-in.png)
 ![securitygroup](../hostname/sg-out.png)
 
+create launch template and move on to continue creating the ASG with the launch template we just created
+
+select your VPC and select private subnet
+
+skip all other settings until you get to Group size and scaling policy then select your desired, max and min capacity. I used 2 because i want 2 instances at all times
+
+click create autoscaling group and you should have the settings as seen in the image below
+
+![Autoscaling](../hostname/autoscaling.png)
 
 
 
+### Application Load-Balancer
+Create an Application load balancer, give it a name and make sure it's internet facing.
 
+Select your VPC and select the network mappings across your subnets
+
+Create a security group with the following rules:
+
+Inbound rule: Allow HTTP on port 80 from anywhere CIDR 0.0.0.0/0
+
+Oubound rule: Allow HTTP on port 80 to destination private instance security
+
+Under Listeners and Routing, create a target group comprising of the instances that your autoscaling group scaled up for you. Make sure to include all the instances you want to deply your app to. That is, the two private instances. 
+![Loadbalancer](../hostname/lb.png)
+
+### DEPLOY APP WITH ANSIBLE PLAY-BOOK
+
+Connect to your bastion host using ssh or aws connect and make sure to copy the .pem key you created for your instances to your bastion host if it isn't there already. SSH into your instances from your bastion host to confirm your connection is working perfectly then deploy your playbook to the app.
+Kindly check in this [playbook](https://github.com/EjiroLaurelD/altschool-cloud-exercises/tree/master/semester3-exercises/hostname) repostiory for my playbook to use as a guide to build your if you do not know how to build one.
+Also note there is a UI template attached to our set up. you can edit it out if you do not want it.
+
+### Target group
+Confirm that your target groups are showing healthy after successful deployment. 
+
+![targetgroup](../hostname/target-group.png)
+
+
+Viola, your app is highly available. Use the ALB link to view it and it should look like this with our two host ips displaying on each refresh.
+![ip](../hostname/ip1.png)
+![ip2](../hostname/ip2.png)
+
+
+Thank you for reading my process.
+
+I will be documenting the process of Configuring the insfrature with an updated Ansible-playbook shortly. 
+
+Watch this space!
