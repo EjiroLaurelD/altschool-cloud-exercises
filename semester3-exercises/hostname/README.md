@@ -57,22 +57,24 @@ I used the following CIDR blocks for my subnets
 ![subnet](../hostname/subnets.png)
 
 ### Internet Gateway
-Create an Internet gateway to allow internet access through our instances and attach it to your VPC. To do this, click on the internet gateway, go to actions then click on attach to VPC. Make sure to attach it to the VPC created for your project.
+Create an Internet gateway to allow internet access through our instances and attach it to your VPC. To do this;
+- Click on internet gateway, go to actions then click on attach to VPC. 
+- Make sure to attach it to the VPC created for your project using the actions dropdown.
 
 ![internetgateway](../hostname/igw.png)
 
 
 ### Route table
-Create route tables and make sure to attach it to the right VPC, the one created.
-
-Click on edit route tables under actions. Add route with the CIDR 0.0.0.0/0  as your destination, then use your created Internet gateway as your target and save changes. Under actions click on edit subnet associations and add your public subnet to your public route table. 
+- Create route tables and make sure to attach it to the right VPC, the one created.
+- Click on edit route tables under actions. Add route with the CIDR 0.0.0.0/0  as your destination, then use your created Internet gateway as your target and save changes. 
+- Under actions click on edit subnet associations and add your public subnet to your public route table. 
 
 ![routetable](../hostname/route-table.png)
 
 
 ### NAT gateway
-Create a NAT-gateway and allocate  an elastic IP to it. Go back to your route tables and edit route tables under actions. Add route with the CIDR 0.0.0.0/0  as your destination, and set target as Nat-gateway then  save changes.
-Under actions click on edit subnet associations and add your public subnet to your public route table.
+- Create a NAT-gateway and allocate  an elastic IP to it. Go back to your route tables and edit route tables under actions. Add route with the CIDR 0.0.0.0/0  as your destination, and set target as Nat-gateway then  save changes.
+- Under actions click on edit subnet associations and add your public subnet to your public route table.
 
 Viola! Our network is set up.
 Lets move on to creating our Instances.
@@ -81,14 +83,14 @@ Lets move on to creating our Instances.
 After we create our network, the next thing is to provision our EC2 instances. To do this we will be creating 1 public instance which will serve as our Bastion host and 2 private instances where we will be deploying our apps to.
 
 ### Creating the Bastion Host
-To do this, create an instance in the public subnet of your VPC and name it Bastion-Host.
+To do this;
+- Create a Public Instance in the public subnet of your VPC and name it Bastion-Host. We are creating it in the public subnet because it is going to be our traffic port
 
-Assign a keypair because you will need it to ssh into the private instances we will create shortly with Autoscaling groups
+- Assign a keypair because you will need it to ssh into the private instances we will create shortly with Autoscaling groups
 
-Create a security group and give it the following rules 
-
-- Inbound rule: allow ssh  anywhere CIDR 0.0.0.0/0
-- outbound rule: allow All traffic CIDR 0.0.0.0/0
+- Create a security group and give it the following rules;
+     - Inbound rule: allow ssh  anywhere CIDR 0.0.0.0/0
+     - Outbound rule: allow All traffic CIDR 0.0.0.0/0
 
 ![securitygroup](../hostname/bhsgin.png)
 ![securitygroup](../hostname/bhsgout.png)
@@ -97,47 +99,47 @@ Next we create our private instances using AutoScaling groups
 
 ### AutoScaling Groups
 
-Navigate to Autoscaling groups at the bottom of your EC2 dashboard and click on create.
+- Navigate to Autoscaling groups at the bottom of your EC2 dashboard and click on create.
 
-Choose a name for your ASG and create a launch template.
+- Choose a name for your ASG and create a launch template.
 
-choose the name of your ASG
+- Choose the name of your ASG
 
-choose your linux distribution and select t2micro
+- Choose your linux distribution and select t2micro
 
-Select a key pair. make sure to use same key with your bastion host or copy the newly keypair to your bastion host. we need this to be able to ssh from your bastion host to the private instances we'll be provioning with ASG
+- Select a Key Pair. Make sure to use same key with your Bastion host or copy the newly created keypair to your Bastion host. We need this to be able to SSH from the bastion host to the private instances we'll be provioning with ASG.
 
-Do not include subnet in launch template. we will include the subnet in the autoscaling group itself.
+- Do not include subnet in launch template. we will include the subnet in the autoscaling group itself.
 
-create security groups with the rules as seen below in image. (Please make sure to edit the rules to include the security group of the ALB after we create it. I took screenshots after I had completed my process  that is why we can see the rule with the ALB sec group at this point)
+- Create security groups with the rules as seen below in image. (Please make sure to edit the rules to include the security group of the ALB after we create it. I took screenshots after I had completed my process  that is why we can see the rule with the ALB sec group at this point)
 
 ![securitygroup](../hostname/sg-in.png)
 ![securitygroup](../hostname/sg-out.png)
 
-create launch template and move on to continue creating the ASG with the launch template we just created
+- Create launch template and move on to continue creating the ASG with the launch template we just created
 
-select your VPC and select private subnet
+- Select your VPC and select private subnet
 
-skip all other settings until you get to Group size and scaling policy then select your desired, max and min capacity. I used 2 because i want 2 instances at all times
+- Skip all other settings until you get to Group size and scaling policy then select your desired, max and min capacity. I used 2 because i want 2 instances at all times
 
-click create autoscaling group and you should have the settings as seen in the image below
+- Click create autoscaling group and you should have the settings as seen in the image below
 
 ![Autoscaling](../hostname/autoscaling.png)
 
 
 
 ### Application Load-Balancer
-Create an Application load balancer, give it a name and make sure it's internet facing.
+- Create an Application load balancer, give it a name and make sure it's internet facing.
 
-Select your VPC and select the network mappings across your subnets
+- Select your VPC and select the network mappings across your subnets
 
-Create a security group with the following rules:
+- Create a security group with the following rules:
 
-Inbound rule: Allow HTTP on port 80 from anywhere CIDR 0.0.0.0/0
+- Inbound rule: Allow HTTP on port 80 from anywhere CIDR 0.0.0.0/0
 
-Oubound rule: Allow HTTP on port 80 to destination private instance security
+- Oubound rule: Allow HTTP on port 80 to destination private instance security
 
-Under Listeners and Routing, create a target group comprising of the instances that your autoscaling group scaled up for you. Make sure to include all the instances you want to deply your app to. That is, the two private instances. 
+- Under Listeners and Routing, create a target group comprising of the instances that your autoscaling group scaled up for you. Make sure to include all the instances you want to deply your app to. That is, the two private instances. 
 ![Loadbalancer](../hostname/lb.png)
 
 ### DEPLOY APP WITH ANSIBLE PLAY-BOOK
