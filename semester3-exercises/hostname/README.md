@@ -25,9 +25,11 @@
 Firstly, I practiced using Ansible to provision the insfracstructure on AWS then also used ansible to deploy Nginx and my app. Playbook is in my repository
 [playbook](https://github.com/EjiroLaurelD/altschool-cloud-exercises/tree/master/semester3-exercises/hostname/AWS-Ansible)   while my app repository is [My-App](https://github.com/EjiroLaurelD/hostname-project)                                               
 
-Second method was using the AWS GUI to manually provison the infrastructure  and created 3 instances, one instance on a public subnet(BASTION-HOST) and 2 instances on the private subnet(INSTANCE A-B)using auto scaling groups. I added the two private instances to a target group in the Load balancer then redirected traffic from the private instance  through the bastion host to the ALB. Next, I deployed the nginx server and my app using ansible then I provisoned Nat gateway to make the site highly available. 
+Second method was using the AWS GUI to manually provision the infrastructure , setting up the logical network and EC2 Instances.
 
-After connecting to the public internet using natgateway, I deleted the natgateway and released the Elastic IP attached to it.
+I created 3 EC2 instances, one instance(BASTION-HOST) on a public subnet and 2 instances (INSTANCE A and B) on the private subnet using AutoScaling groups. I added the two private instances to a target group in the Load balancer then redirected traffic from the private instance through the bastion host to the ALB. Next, I deployed the nginx server and my app using ansible then I provisoned a Nat-gateway to make the site highly available.
+
+After connecting to the public internet using Nat-gateway, I deleted the Natgateway and released the Elastic IP attached to it.
 
 My-App is live and running with ALB url http://project-alb-362817232.us-east-1.elb.amazonaws.com/
  domain-name: ejirolaureld.me
