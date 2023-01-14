@@ -158,9 +158,15 @@ Viola, your app is highly available. Use the ALB link to view it and it should l
 ![ip](../hostname/ip1.png)
 ![ip2](../hostname/ip2.png)
 
+Delete your Nat gateway as it is not a free service and release the Elastic Ip.
+
+Your App will be on and running as long as you do not do any further update on it. So unless you are completely done with the setup, do not delete your Nat gatway.
+
+We have come to the end of this project, I hope you enjoyed it as I much as I did.
 
 Thank you for reading my process.
 
-I will be documenting the process of Configuring the insfrastructure with an updated Ansible-playbook shortly. 
+I will be documenting the process of Configuring the entire process (Infrastructure as code) with an updated Ansible-playbook shortly.
 
 Watch this space!
+
