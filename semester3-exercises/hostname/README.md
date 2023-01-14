@@ -56,6 +56,12 @@ I used the following CIDR blocks for my subnets
 
 ![subnet](../hostname/subnets.png)
 
+### Internet Gateway
+Create an Internet gateway to allow internet access through our instances and attach it to your VPC. To do this, click on the internet gateway, go to actions then click on attach to VPC. Make sure to attach it to the VPC created for your project.
+
+![internetgateway](../hostname/igw.png)
+
+
 ### Route table
 Create route tables and make sure to attach it to the right VPC, the one created.
 
@@ -63,11 +69,6 @@ Click on edit route tables under actions. Add route with the CIDR 0.0.0.0/0  as 
 
 ![routetable](../hostname/route-table.png)
 
-
-### Internet Gateway
-Create an Internet gateway to allow internet access through our instances and attach it to your VPC. To do this, click on the internet gateway, go to actions then click on attach to VPC. Make sure to attach it to the VPC created for your project.
-
-![internetgateway](../hostname/igw.png)
 
 ### NAT gateway
 Create a NAT-gateway and allocate  an elastic IP to it. Go back to your route tables and edit route tables under actions. Add route with the CIDR 0.0.0.0/0  as your destination, and set target as Nat-gateway then  save changes.
@@ -90,7 +91,7 @@ Create a security group and give it the following rules
 - outbound rule: allow All traffic CIDR 0.0.0.0/0
 
 ![securitygroup](../hostname/bhsgin.png)
-![securitygroup](../hostname/bhout.png)
+![securitygroup](../hostname/bhsgout.png)
 
 Next we create our private instances using AutoScaling groups
 
